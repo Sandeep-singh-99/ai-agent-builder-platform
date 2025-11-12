@@ -1,5 +1,6 @@
 import React from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import MyAgents from "./MyAgents";
 
 export default function AiAgentTab() {
   return (
@@ -10,7 +11,7 @@ export default function AiAgentTab() {
           <TabsTrigger value="template">Templates</TabsTrigger>
         </TabsList>
         <TabsContent value="myagent">
-          Make changes to your account here.
+          <MyAgents />
         </TabsContent>
         <TabsContent value="template">Change your password here.</TabsContent>
       </Tabs>
