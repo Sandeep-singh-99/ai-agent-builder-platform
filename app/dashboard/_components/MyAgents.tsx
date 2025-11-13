@@ -7,6 +7,7 @@ import { useConvex } from 'convex/react';
 import { GitBranchPlusIcon } from 'lucide-react';
 import React, { useContext, useEffect, useState } from 'react'
 import moment from 'moment';
+import Link from 'next/link';
 
 export default function MyAgents() {
   const { userDetail, setUserDetail } = useContext(UserDetailContext);
@@ -32,11 +33,11 @@ export default function MyAgents() {
       <div className='grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6'>
         {
           agentList?.map((agent, index) => (
-            <div key={index} className='p-3 border rounded-2xl shadow-xl'>
+            <Link href={`/agent-builder/${agent.agentId}`} key={index} className='p-3 border rounded-2xl shadow-xl'>
               <GitBranchPlusIcon  className='bg-yellow-100 dark:text-black p-1 h-8 w-8 rounded-sm'/>
               <h1 className='mt-3'>{agent.name}</h1>
               <p className='text-sm text-gray-400 mt-2'>{ moment(agent._creationTime).fromNow() }</p>
-            </div>
+            </Link>
           ))
         }
       </div>
