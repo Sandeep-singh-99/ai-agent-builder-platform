@@ -4,12 +4,22 @@ import { useMutation } from 'convex/react';
 import React, { useEffect, useState } from 'react'
 import { api } from "../convex/_generated/api";
 import { UserDetailContext } from '@/context/UserDetailContext';
+import { WorkflowContext } from '@/context/WorkflowComntext';
 
 export default function Provider({ children }: { children: React.ReactNode }) {
 
     const { user } = useUser();
     const createUser = useMutation(api.user.CreateNewUser);
     const [userDetail, setUserDetail] = useState<any>(null);
+
+    const [addedNodes, setAddedNodes] = useState([{
+        id: 'start',
+        position: { x: 0, y: 0 },
+        data: { label: 'Start' },
+        type: 'StartNode',
+    }])
+
+    const [nodeEdges, setNodeEdges] = useState<any>([]);
 
     useEffect(() => {
         CreateAndGetUser();
@@ -27,7 +37,9 @@ export default function Provider({ children }: { children: React.ReactNode }) {
     }
   return (
     <UserDetailContext.Provider value={{userDetail, setUserDetail}}>
+        <WorkflowContext.Provider value={{addedNodes, setAddedNodes, nodeEdges, setNodeEdges}}>
           <div>{children}</div>
+        </WorkflowContext.Provider>
     </UserDetailContext.Provider>
   )
 }

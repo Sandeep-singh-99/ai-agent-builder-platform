@@ -1,5 +1,5 @@
 "use client";
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useContext, useEffect, useState } from "react";
 import Header from "../_components/Header";
 import {
   ReactFlow,
@@ -10,16 +10,19 @@ import {
   Controls,
   MiniMap,
   MiniMapNode,
+  Panel,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 import StartNode from "../_components/StartNode";
 import AgentNode from "../_components/AgentNode";
+import AgentToolsPanel from "../_components/AgentToolsPanel";
+import { WorkflowContext } from "@/context/WorkflowComntext";
 
-const initialNodes = [
-  { id: "n1", position: { x: 0, y: 0 }, data: { label: "Node 1" }, type: "StartNode" },
-  { id: "n2", position: { x: 0, y: 100 }, data: { label: "Node 2" }, type: "AgentNode" },
-];
-const initialEdges = [{ id: "n1-n2", source: "n1", target: "n2" }];
+// const initialNodes = [
+//   // { id: "n1", position: { x: 0, y: 0 }, data: { label: "Node 1" }, type: "StartNode" },
+//   // { id: "n2", position: { x: 0, y: 100 }, data: { label: "Node 2" }, type: "AgentNode" },
+// ];
+// const initialEdges = [{ id: "n1-n2", source: "n1", target: "n2" }];
 
 const nodeTypes = {
   StartNode: StartNode,
@@ -27,8 +30,14 @@ const nodeTypes = {
 };
 
 export default function AgentBuilder() {
-  const [nodes, setNodes] = useState(initialNodes);
-  const [edges, setEdges] = useState(initialEdges);
+  const [nodes, setNodes] = useState([]);
+  const [edges, setEdges] = useState([]);
+
+   const {addedNodes, setAddedNodes} = useContext(WorkflowContext);
+
+   useEffect(() => {
+    addedNodes && setNodes(addedNodes);
+   }, [addedNodes])
 
   const onNodesChange = useCallback(
     (changes: any) =>
@@ -62,6 +71,13 @@ export default function AgentBuilder() {
             <Controls />
             { /* @ts-ignore */}
             <Background variant="dots" gap={12} size={1} />
+            <Panel position="top-left">
+              <AgentToolsPanel />
+            </Panel>
+
+            <Panel position="top-right">
+              Settings
+            </Panel>
         </ReactFlow>
       </div>
     </div>
