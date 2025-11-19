@@ -9,6 +9,7 @@ import { GitBranchPlus } from "lucide-react";
 import Link from "next/link";
 import React, { useContext, useEffect, useState } from "react";
 import moment from "moment";
+import { Id } from "@/convex/_generated/dataModel";
 
 export default function MyAgents() {
   const { userDetail, setUserDetail } = useContext(UserDetailContext);
@@ -21,8 +22,10 @@ export default function MyAgents() {
 
   const GetUserAgents = async () => {
     const results = await convex.query(api.agent.GetUserAgents, {
-      userId: userDetail?._id,
+      userId: userDetail?._id as Id<"UserTable">, 
     });
+    console.log("Results", results);
+    
     setAgentList(results);
   };
   return (
