@@ -1,7 +1,7 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import { Loader, Plus } from "lucide-react";
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import {
   Dialog,
   DialogClose,
@@ -17,6 +17,7 @@ import { useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { v4 as uuidv4 } from "uuid";
 import { useRouter } from "next/navigation";
+import { UserDetailContext } from "@/context/UserDetailContext";
 
 export default function CreateAgentSection() {
   const [openDialog, setOpenDialog] = useState(false);
@@ -24,6 +25,8 @@ export default function CreateAgentSection() {
   const CreateAgentMutation = useMutation(api.agent.CreateAgent);
   const [agentName, setAgentName] = useState("");
   const [loading, setLoading] = useState(false);
+
+  const {userDetail, setUserDetail} = useContext(UserDetailContext);
 
   const router = useRouter();
 
@@ -33,6 +36,7 @@ export default function CreateAgentSection() {
     const results = await CreateAgentMutation({
       name: agentName ?? '',
       agentId: agentId,
+      userId: userDetail?._id 
     })
     setOpenDialog(false);
     setLoading(false);
