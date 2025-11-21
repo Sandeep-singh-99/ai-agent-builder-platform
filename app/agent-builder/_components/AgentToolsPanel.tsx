@@ -28,21 +28,21 @@ const AgentTools = [
         name: 'While',
         icon: Repeat,
         bgColor: '#E3F2FD',
-        type: 'while',
+        type: 'WhileNode',
         id: 'WhileNode'
     },
     {
         name: 'User Approval',
         icon: ThumbsUp,
         bgColor: '#EADCF8',
-        type: 'approval',
+        type: 'UserApprovalNode',
         id: 'ApprovalNode'
     },
     {
         name: 'API',
         icon: Webhook,
         bgColor: '#D1F0FF',
-        type: 'api',
+        type: 'ApiNode',
         id: 'ApiNode'
     },
 ]

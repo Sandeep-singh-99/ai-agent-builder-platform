@@ -24,6 +24,11 @@ import { Agent } from "@/types/AgentTypes";
 import { Button } from "@/components/ui/button";
 import { Save } from "lucide-react";
 import { toast } from "sonner";
+import EndNode from "../_customNodes/EndNode";
+import IfElseNode from "../_customNodes/IfElseNode";
+import WhileNode from "../_customNodes/WhileNode";
+import UserApprovalNode from "../_customNodes/UserApprovalNode";
+import ApiNode from "../_customNodes/ApiNode";
 
 // const initialNodes = [
 //   { id: "n1", position: { x: 0, y: 0 }, data: { label: "Node 1" }, type: 'StartNode' },
@@ -33,7 +38,12 @@ import { toast } from "sonner";
 
 const nodeTypes = {
     StartNode: StartNode,
-    AgentNode: AgentNode
+    AgentNode: AgentNode,
+    EndNode: EndNode,
+    IfElseNode: IfElseNode,
+    WhileNode: WhileNode,
+    UserApprovalNode: UserApprovalNode,
+    ApiNode: ApiNode
 }
 
 export default function AgentBuilder() {
