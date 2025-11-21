@@ -17,6 +17,10 @@ import StartNode from "../_components/StartNode";
 import AgentNode from "../_components/AgentNode";
 import AgentToolsPanel from "../_components/AgentToolsPanel";
 import { WorkflowContext } from "@/context/WorkflowContext";
+import { useConvex } from "convex/react";
+import { useParams } from "next/navigation";
+import { api } from "@/convex/_generated/api";
+import { Agent } from "@/types/AgentTypes";
 
 // const initialNodes = [
 //   { id: "n1", position: { x: 0, y: 0 }, data: { label: "Node 1" }, type: 'StartNode' },
@@ -33,6 +37,23 @@ export default function AgentBuilder() {
   const [nodes, setNodes] = useState([]);
   const [edges, setEdges] = useState([]);
 
+  const { agentId } = useParams();
+
+  const convex = useConvex();
+
+  const [agentDetail, setAgentDetail] = useState<Agent>();
+
+  const GetAgentDetail = async () => {
+    const results = await convex.query(api.agent.GetAgentById, {
+      agentId: agentId as string
+    })
+    setAgentDetail(results);
+  }
+
+  useEffect(() => {
+    GetAgentDetail();
+  },[])
+
   const { addedNodes, setAddedNodes, nodeEdges, setNodeEdges } = useContext(WorkflowContext);
 
   useEffect(() => {
@@ -45,7 +66,7 @@ export default function AgentBuilder() {
   }, [edges])
 
   const SaveNodeAndEdges = () => {
-    
+
   }
 
   const onNodesChange = useCallback(
@@ -69,7 +90,7 @@ export default function AgentBuilder() {
   );
   return (
     <div>
-      <Header />
+      <Header agentDetail = {agentDetail} />
       <div style={{ width: "100vw", height: "90vh" }}>
         <ReactFlow
           nodes={nodes}

@@ -7,5 +7,7 @@ export type Agent = {
     config?: any;
     published: boolean;
     userId: Id<"UserTable">;
+    nodes?:any,
+    edges?:any
     _creationTime: number
 }

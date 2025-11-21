@@ -27,3 +27,15 @@ export const GetUserAgents = query({
         return results;
     }
 })
+
+export const GetAgentById = query({
+    args: {
+        agentId: v.string(),
+    },
+
+    handler: async (ctx , args) => {
+        const results = await ctx.db.query("AgentTable").filter(q=> q.eq(q.field("agentId"), args.agentId)).order("desc").collect();
+
+        return results[0];
+    }
+})
