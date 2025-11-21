@@ -54,7 +54,7 @@ export default function AgentToolsPanel() {
         const newNode = {
             id: `${tool.id}-${Date.now()}`,
             position: {x: 0, y: 100},
-            data: {label: tool.name, ...tool},
+            data: {label: tool.name, bgColor:tool.bgColor, id: tool.id, type: tool.type},
             type: tool.type
         }
         setAddedNodes((prev: any) => [...prev, newNode])

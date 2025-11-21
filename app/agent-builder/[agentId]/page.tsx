@@ -17,10 +17,13 @@ import StartNode from "../_components/StartNode";
 import AgentNode from "../_components/AgentNode";
 import AgentToolsPanel from "../_components/AgentToolsPanel";
 import { WorkflowContext } from "@/context/WorkflowContext";
-import { useConvex } from "convex/react";
+import { useConvex, useMutation } from "convex/react";
 import { useParams } from "next/navigation";
 import { api } from "@/convex/_generated/api";
 import { Agent } from "@/types/AgentTypes";
+import { Button } from "@/components/ui/button";
+import { Save } from "lucide-react";
+import { toast } from "sonner";
 
 // const initialNodes = [
 //   { id: "n1", position: { x: 0, y: 0 }, data: { label: "Node 1" }, type: 'StartNode' },
@@ -41,6 +44,8 @@ export default function AgentBuilder() {
 
   const convex = useConvex();
 
+  const updateAgentDetail = useMutation(api.agent.UpdateAgentDetail)
+
   const [agentDetail, setAgentDetail] = useState<Agent>();
 
   const GetAgentDetail = async () => {
@@ -57,16 +62,32 @@ export default function AgentBuilder() {
   const { addedNodes, setAddedNodes, nodeEdges, setNodeEdges } = useContext(WorkflowContext);
 
   useEffect(() => {
+    if (agentDetail) {
+      setNodes(agentDetail.nodes)
+      setEdges(agentDetail.edges)
+      setAddedNodes(agentDetail.nodes)
+      setNodeEdges(agentDetail.edges)
+    }
+  }, [agentDetail])
+
+  useEffect(() => {
     addedNodes && setNodes(addedNodes)
-    nodeEdges && setEdges(nodeEdges)
   }, [addedNodes])
 
   useEffect(() => {
     edges && setNodeEdges(edges);
   }, [edges])
 
-  const SaveNodeAndEdges = () => {
 
+
+  const SaveNodeAndEdges = async () => {
+    const result = await updateAgentDetail({
+      //@ts-ignore
+      id: agentDetail?._id,
+      edges: nodeEdges,
+      nodes: addedNodes
+    })
+    toast.success("Saved!")
   }
 
   const onNodesChange = useCallback(
@@ -111,6 +132,11 @@ export default function AgentBuilder() {
 
             <Panel position="top-right">
               Settings panel
+            </Panel>
+            <Panel position="bottom-center">
+              <Button onClick={SaveNodeAndEdges}>
+                <Save /> Save
+              </Button>
             </Panel>
         </ReactFlow>
       </div>
