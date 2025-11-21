@@ -13,8 +13,8 @@ import {
   Panel,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
-import StartNode from "../_components/StartNode";
-import AgentNode from "../_components/AgentNode";
+import StartNode from "../_customNodes/StartNode";
+import AgentNode from "../_customNodes/AgentNode";
 import AgentToolsPanel from "../_components/AgentToolsPanel";
 import { WorkflowContext } from "@/context/WorkflowContext";
 import { useConvex, useMutation } from "convex/react";
