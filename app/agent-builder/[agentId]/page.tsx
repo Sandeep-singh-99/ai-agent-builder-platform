@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import React, { useContext, useEffect } from "react";
 import Header from "../_components/Header";
 import { useState, useCallback } from "react";
@@ -40,14 +40,14 @@ import SettingPanel from "../_components/SettingPanel";
 // const initialEdges = [{ id: "n1-n2", source: "n1", target: "n2" }];
 
 const nodeTypes = {
-    StartNode: StartNode,
-    AgentNode: AgentNode,
-    EndNode: EndNode,
-    IfElseNode: IfElseNode,
-    WhileNode: WhileNode,
-    UserApprovalNode: UserApprovalNode,
-    ApiNode: ApiNode
-}
+  StartNode: StartNode,
+  AgentNode: AgentNode,
+  EndNode: EndNode,
+  IfElseNode: IfElseNode,
+  WhileNode: WhileNode,
+  UserApprovalNode: UserApprovalNode,
+  ApiNode: ApiNode,
+};
 
 export default function AgentBuilder() {
   const [nodes, setNodes] = useState([]);
@@ -57,59 +57,63 @@ export default function AgentBuilder() {
 
   const convex = useConvex();
 
-  const updateAgentDetail = useMutation(api.agent.UpdateAgentDetail)
+  const updateAgentDetail = useMutation(api.agent.UpdateAgentDetail);
 
   const [agentDetail, setAgentDetail] = useState<Agent>();
 
   const GetAgentDetail = async () => {
     const results = await convex.query(api.agent.GetAgentById, {
-      agentId: agentId as string
-    })
+      agentId: agentId as string,
+    });
     setAgentDetail(results);
-  }
+  };
 
   useEffect(() => {
     GetAgentDetail();
-  },[])
+  }, []);
 
-  const { addedNodes, setAddedNodes, nodeEdges, setNodeEdges, setSelectedNode } = useContext(WorkflowContext);
+  const {
+    addedNodes,
+    setAddedNodes,
+    nodeEdges,
+    setNodeEdges,
+    setSelectedNode,
+  } = useContext(WorkflowContext);
 
   useEffect(() => {
     if (agentDetail) {
-      setNodes(agentDetail.nodes)
-      setEdges(agentDetail.edges)
-      setAddedNodes(agentDetail.nodes)
-      setNodeEdges(agentDetail.edges)
+      setNodes(agentDetail.nodes);
+      setEdges(agentDetail.edges);
+      setAddedNodes(agentDetail.nodes);
+      setNodeEdges(agentDetail.edges);
     }
-  }, [agentDetail])
+  }, [agentDetail]);
 
   useEffect(() => {
-    addedNodes && setNodes(addedNodes)
-  }, [addedNodes])
+    addedNodes && setNodes(addedNodes);
+  }, [addedNodes]);
 
   useEffect(() => {
     edges && setNodeEdges(edges);
-  }, [edges])
+  }, [edges]);
 
-
-
-  const SaveNodeAndEdges = async () => {
+  const SaveNodeAndEdges = async (updatedNodes?: any, updatedEdges?: any) => {
     const result = await updateAgentDetail({
       //@ts-ignore
       id: agentDetail?._id,
-      edges: nodeEdges,
-      nodes: addedNodes
-    })
-    toast.success("Saved!")
-  }
+      edges: updatedEdges ?? nodeEdges,
+      nodes: updatedNodes ?? addedNodes,
+    });
+    toast.success("Saved!");
+  };
 
   const onNodesChange = useCallback(
     (changes: any) =>
-      setNodes((nodesSnapshot) =>  
-       { const updated =  applyNodeChanges(changes, nodesSnapshot) 
-        setAddedNodes(updated)
-        return updated
-       }),
+      setNodes((nodesSnapshot) => {
+        const updated = applyNodeChanges(changes, nodesSnapshot);
+        setAddedNodes(updated);
+        return updated;
+      }),
     [setAddedNodes]
   );
   const onEdgesChange = useCallback(
@@ -119,20 +123,24 @@ export default function AgentBuilder() {
   );
   const onConnect = useCallback(
     // @ts-ignore
-    (params: any) => setEdges((edgesSnapshot) => addEdge(params, edgesSnapshot)),
+    (params: any) =>
+      setEdges((edgesSnapshot) => addEdge(params, edgesSnapshot)),
     []
   );
 
-  const onNodeSelect = useCallback(({nodes, edges}: OnSelectionChangeParams) => {
-    setSelectedNode(nodes[0])
-  },[])
+  const onNodeSelect = useCallback(
+    ({ nodes, edges }: OnSelectionChangeParams) => {
+      setSelectedNode(nodes[0]);
+    },
+    []
+  );
 
   useOnSelectionChange({
-    onChange: onNodeSelect
-  })
+    onChange: onNodeSelect,
+  });
   return (
     <div>
-      <Header agentDetail = {agentDetail} />
+      <Header agentDetail={agentDetail} />
       <div style={{ width: "100vw", height: "90vh" }}>
         <ReactFlow
           nodes={nodes}
@@ -140,25 +148,26 @@ export default function AgentBuilder() {
           onNodesChange={onNodesChange}
           onEdgesChange={onEdgesChange}
           onConnect={onConnect}
+          onNodeClick={(e, node) => setSelectedNode(node)}
           nodeTypes={nodeTypes}
           fitView
         >
-            <MiniMap />
-            <Controls />
-            {/* @ts-ignore */}
-            <Background variant="dots" gap={12} size={1} />
-            <Panel position="top-left">
-              <AgentToolsPanel />
-            </Panel>
+          <MiniMap />
+          <Controls />
+          {/* @ts-ignore */}
+          <Background variant="dots" gap={12} size={1} />
+          <Panel position="top-left">
+            <AgentToolsPanel />
+          </Panel>
 
-            <Panel position="top-right">
-              <SettingPanel />
-            </Panel>
-            <Panel position="bottom-center">
-              <Button onClick={SaveNodeAndEdges}>
-                <Save /> Save
-              </Button>
-            </Panel>
+          <Panel position="top-right">
+            <SettingPanel onSave={(nodes: any) => SaveNodeAndEdges(nodes)} />
+          </Panel>
+          <Panel position="bottom-center">
+            <Button onClick={() => SaveNodeAndEdges()}>
+              <Save /> Save
+            </Button>
+          </Panel>
         </ReactFlow>
       </div>
     </div>
