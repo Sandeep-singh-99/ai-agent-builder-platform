@@ -10,7 +10,7 @@ export default function ApiNode({data}: any) {
                 backgroundColor: data?.bgColor
             }} />
             <div>
-                <h2>API</h2>
+                <h2>{data?.label}</h2>
                 <p className='text-xs text-gray-500'>API</p>
             </div>
             <Handle type='target' position={Position.Left} />

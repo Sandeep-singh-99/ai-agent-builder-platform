@@ -5,6 +5,7 @@ import EndSettings from "../_nodeSettings/EndSettings";
 import IfElseSetting from "../_nodeSettings/IfElseSetting";
 import WhileSettings from "../_nodeSettings/WhileSettings";
 import UserApprovalSettings from "../_nodeSettings/UserApprovalSettings";
+import ApiSettings from "../_nodeSettings/ApiSettings";
 
 export default function SettingPanel({
   onSave,
@@ -53,6 +54,9 @@ export default function SettingPanel({
             updateFormData={(value: any) => onUpdateNodeData(value)} />}
 
         {selectedNode?.type === "UserApprovalNode" && <UserApprovalSettings selectedNode={selectedNode}
+            updateFormData={(value: any) => onUpdateNodeData(value)} />}
+
+        {selectedNode?.type === "ApiNode" && <ApiSettings selectedNode={selectedNode}
             updateFormData={(value: any) => onUpdateNodeData(value)} />}
       </div>
     )
