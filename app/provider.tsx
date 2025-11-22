@@ -5,12 +5,14 @@ import React, { useEffect, useState } from 'react'
 import { api } from "../convex/_generated/api";
 import { UserDetailContext } from '@/context/UserDetailContext';
 import { WorkflowContext } from '@/context/WorkflowContext';
+import { ReactFlowProvider } from '@xyflow/react';
 
 export default function Provider({ children }: { children: React.ReactNode }) {
 
     const { user } = useUser();
     const createUser = useMutation(api.user.CreateNewUser);
     const [userDetail, setUserDetail] = useState<any>(null);
+    const [selectedNode, setSelectedNode] = useState<any>();
     const [addedNodes, setAddedNodes] = useState([{
         id: 'start',
         position: {x:0, y:0},
@@ -36,9 +38,11 @@ export default function Provider({ children }: { children: React.ReactNode }) {
     }
   return (
     <UserDetailContext.Provider value={{userDetail, setUserDetail}}>
-        <WorkflowContext.Provider value={{addedNodes, setAddedNodes, nodeEdges, setNodeEdges}}>
+        <ReactFlowProvider>
+        <WorkflowContext.Provider value={{addedNodes, setAddedNodes, nodeEdges, setNodeEdges, selectedNode, setSelectedNode}}>
           <div>{children}</div>
         </WorkflowContext.Provider>
+        </ReactFlowProvider>
     </UserDetailContext.Provider>
   )
 }

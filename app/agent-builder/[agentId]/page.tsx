@@ -11,6 +11,8 @@ import {
   MiniMap,
   Controls,
   Panel,
+  useOnSelectionChange,
+  OnSelectionChangeParams,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 import StartNode from "../_customNodes/StartNode";
@@ -29,6 +31,7 @@ import IfElseNode from "../_customNodes/IfElseNode";
 import WhileNode from "../_customNodes/WhileNode";
 import UserApprovalNode from "../_customNodes/UserApprovalNode";
 import ApiNode from "../_customNodes/ApiNode";
+import SettingPanel from "../_components/SettingPanel";
 
 // const initialNodes = [
 //   { id: "n1", position: { x: 0, y: 0 }, data: { label: "Node 1" }, type: 'StartNode' },
@@ -69,7 +72,7 @@ export default function AgentBuilder() {
     GetAgentDetail();
   },[])
 
-  const { addedNodes, setAddedNodes, nodeEdges, setNodeEdges } = useContext(WorkflowContext);
+  const { addedNodes, setAddedNodes, nodeEdges, setNodeEdges, setSelectedNode } = useContext(WorkflowContext);
 
   useEffect(() => {
     if (agentDetail) {
@@ -119,6 +122,14 @@ export default function AgentBuilder() {
     (params: any) => setEdges((edgesSnapshot) => addEdge(params, edgesSnapshot)),
     []
   );
+
+  const onNodeSelect = useCallback(({nodes, edges}: OnSelectionChangeParams) => {
+    setSelectedNode(nodes[0])
+  },[])
+
+  useOnSelectionChange({
+    onChange: onNodeSelect
+  })
   return (
     <div>
       <Header agentDetail = {agentDetail} />
@@ -141,7 +152,7 @@ export default function AgentBuilder() {
             </Panel>
 
             <Panel position="top-right">
-              Settings panel
+              <SettingPanel />
             </Panel>
             <Panel position="bottom-center">
               <Button onClick={SaveNodeAndEdges}>
