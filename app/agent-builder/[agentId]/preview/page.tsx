@@ -8,11 +8,14 @@ import { Agent } from "@/types/AgentTypes";
 import { Background, ReactFlow } from "@xyflow/react";
 import { nodeTypes } from "../page";
 import "@xyflow/react/dist/style.css";
+import axios from "axios";
 
 export default function PreviewAgent() {
   const { agentId } = useParams();
   const convex = useConvex();
   const [agentDetail, setAgentDetail] = useState<Agent>();
+  const [flowConfig, setFlowConfig] = useState<any>(null);
+  const [loading, setLoading] = useState(false);
 
   const GetAgentDetail = async () => {
     const results = await convex.query(api.agent.GetAgentById, {
@@ -114,8 +117,18 @@ export default function PreviewAgent() {
         startNode: startNode?.id || null,
         flow
     }
+    setFlowConfig(config);
 
     console.log("Generated Workflow Config", JSON.stringify(config));
+  }
+
+  const GenerateAgentToolConfig = async () => {
+    setLoading(true)
+    const result = await axios.post(`/api/generate-agent-tool-config`, {
+        jsonConfig: JSON.stringify(flowConfig)
+    })
+    setLoading(false)
+    console.log("Generated Agent Tool Config", result.data);
   }
 
 

@@ -17,6 +17,7 @@ export default defineSchema({
         published: v.boolean(),
         nodes: v.optional(v.any()),
         edges: v.optional(v.any()),
+        agentToolConfig: v.optional(v.any()),
         userId: v.id("UserTable"),
     })
 })
