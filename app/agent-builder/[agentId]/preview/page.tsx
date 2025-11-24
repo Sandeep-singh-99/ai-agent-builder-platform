@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import Header from "../../_components/Header";
-import { useConvex } from "convex/react";
+import { useConvex, useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { useParams } from "next/navigation";
 import { Agent } from "@/types/AgentTypes";
@@ -9,6 +9,8 @@ import { Background, ReactFlow } from "@xyflow/react";
 import { nodeTypes } from "../page";
 import "@xyflow/react/dist/style.css";
 import axios from "axios";
+import { Button } from "@/components/ui/button";
+import { RefreshCcwIcon } from "lucide-react";
 
 export default function PreviewAgent() {
   const { agentId } = useParams();
@@ -16,6 +18,7 @@ export default function PreviewAgent() {
   const [agentDetail, setAgentDetail] = useState<Agent>();
   const [flowConfig, setFlowConfig] = useState<any>(null);
   const [loading, setLoading] = useState(false);
+  const updateAgentToolConfig = useMutation(api.agent.UpdateAgentToolConfig);
 
   const GetAgentDetail = async () => {
     const results = await convex.query(api.agent.GetAgentById, {
@@ -129,6 +132,13 @@ export default function PreviewAgent() {
     })
     setLoading(false)
     console.log("Generated Agent Tool Config", result.data);
+
+    await updateAgentToolConfig({
+        id: agentDetail?._id as any,
+        agentToolConfig: result.data
+    })
+
+    GetAgentDetail();
   }
 
 
@@ -153,7 +163,12 @@ export default function PreviewAgent() {
           </div>
         </div>
         <div className="col-span-1 border-2 rounded-2xl m-5 p-5">
-            CHAT UI
+          <div className="flex items-center justify-center h-full">
+            {!agentDetail?.agentToolConfig && <Button onClick={GenerateAgentToolConfig} disabled={loading}>
+              <RefreshCcwIcon className={loading ? `animate-spin` : ''}/>
+              Reboot Agent
+              </Button>}
+          </div>
         </div>
       </div>
     </div>

@@ -54,3 +54,17 @@ export const UpdateAgentDetail = mutation({
         })
     }
 })
+
+
+export const UpdateAgentToolConfig = mutation({
+    args: {
+        id: v.id('AgentTable'),
+        agentToolConfig: v.any()
+    },
+
+    handler: async (ctx , args) => {
+        await ctx.db.patch(args.id, {
+            agentToolConfig: args.agentToolConfig
+        })
+    }
+})

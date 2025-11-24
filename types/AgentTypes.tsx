@@ -8,6 +8,7 @@ export type Agent = {
     published: boolean;
     userId: Id<"UserTable">;
     nodes?:any,
-    edges?:any
+    edges?:any,
+    agentToolConfig?:any,
     _creationTime: number
 }
