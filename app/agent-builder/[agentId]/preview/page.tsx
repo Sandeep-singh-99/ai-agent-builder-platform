@@ -11,6 +11,7 @@ import "@xyflow/react/dist/style.css";
 import axios from "axios";
 import { Button } from "@/components/ui/button";
 import { RefreshCcwIcon } from "lucide-react";
+import ChatUI from "./_components/ChatUI";
 
 export default function PreviewAgent() {
   const { agentId } = useParams();
@@ -162,15 +163,18 @@ export default function PreviewAgent() {
             </ReactFlow>
           </div>
         </div>
-        <div className="col-span-1 border-2 rounded-2xl m-5 p-5">
+        <div className="">
           <div className="flex items-center justify-center h-full">
-            {!agentDetail?.agentToolConfig && <Button onClick={GenerateAgentToolConfig} disabled={loading}>
+            {!agentDetail?.agentToolConfig ? <Button onClick={GenerateAgentToolConfig} disabled={loading}>
               <RefreshCcwIcon className={loading ? `animate-spin` : ''}/>
               Reboot Agent
-              </Button>}
+              </Button> : <ChatUI GenerateAgentToolConfig={GenerateAgentToolConfig} loading={loading} agentDetail={agentDetail} />}
           </div>
         </div>
       </div>
     </div>
   );
 }
+
+
+// col-span-1 border-2 rounded-2xl m-5 p-5
