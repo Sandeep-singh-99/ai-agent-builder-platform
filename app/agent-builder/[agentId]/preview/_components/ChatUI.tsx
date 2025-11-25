@@ -10,9 +10,14 @@ import {
   RefreshCcw,
   Send,
   User,
+  Trash2,
 } from "lucide-react";
 import React, { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
+import axios from "axios";
+import { useMutation, useQuery } from "convex/react";
+import { api } from "@/convex/_generated/api";
+import { v4 as uuidv4 } from "uuid";
 
 type Props = {
   GenerateAgentToolConfig: () => void;
@@ -21,7 +26,7 @@ type Props = {
 };
 
 interface Message {
-  id: string;
+  id?: string;
   role: "user" | "ai";
   content: string;
   createdAt: number;
@@ -32,10 +37,30 @@ export default function ChatUI({
   loading: rebooting,
   agentDetail,
 }: Props) {
-  const [messages, setMessages] = useState<Message[]>([]);
+  const [sessionId, setSessionId] = useState<string | null>(null);
   const [inputValue, setInputValue] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  // Initialize Session ID
+  useEffect(() => {
+    let storedSessionId = localStorage.getItem(
+      `chat_session_${agentDetail._id}`
+    );
+    if (!storedSessionId) {
+      storedSessionId = uuidv4();
+      localStorage.setItem(`chat_session_${agentDetail._id}`, storedSessionId);
+    }
+    setSessionId(storedSessionId);
+  }, [agentDetail._id]);
+
+  // Convex Hooks
+  const saveMessage = useMutation(api.chat.SaveMessage);
+  const clearChat = useMutation(api.chat.ClearChat);
+  const dbMessages = useQuery(
+    api.chat.GetMessages,
+    sessionId ? { agentId: agentDetail._id, sessionId } : "skip"
+  );
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -43,34 +68,63 @@ export default function ChatUI({
 
   useEffect(() => {
     scrollToBottom();
-  }, [messages, isTyping]);
+  }, [dbMessages, isTyping]);
 
   const handleSendMessage = async () => {
-    if (!inputValue.trim()) return;
+    if (!inputValue.trim() || !sessionId) return;
 
-    const newMessage: Message = {
-      id: Date.now().toString(),
-      role: "user",
-      content: inputValue.trim(),
-      createdAt: Date.now(),
-    };
-
-    setMessages((prev) => [...prev, newMessage]);
+    const userMsgContent = inputValue.trim();
     setInputValue("");
     setIsTyping(true);
 
-    // Simulate AI response for UI testing
-    setTimeout(() => {
-      const aiResponse: Message = {
-        id: (Date.now() + 1).toString(),
-        role: "ai",
-        content:
-          "I'm a simulated AI response. The backend is not connected yet, but I look good!",
+    try {
+      // 1. Save User Message
+      await saveMessage({
+        agentId: agentDetail._id,
+        role: "user",
+        content: userMsgContent,
+        sessionId: sessionId,
         createdAt: Date.now(),
-      };
-      setMessages((prev) => [...prev, aiResponse]);
+      });
+
+      // 2. Call AI API
+      // Construct history from dbMessages + new user message
+      const currentHistory =
+        dbMessages?.map((msg) => ({ role: msg.role, content: msg.content })) ||
+        [];
+
+      const response = await axios.post("/api/agent-chat", {
+        messages: [
+          ...currentHistory,
+          { role: "user", content: userMsgContent },
+        ],
+        agentToolConfig: agentDetail.agentToolConfig,
+      });
+
+      // 3. Save AI Response
+      await saveMessage({
+        agentId: agentDetail._id,
+        role: "ai",
+        content: response.data.response,
+        sessionId: sessionId,
+        createdAt: Date.now(),
+      });
+    } catch (error) {
+      toast.error("Failed to get response from AI");
+      console.error(error);
+    } finally {
       setIsTyping(false);
-    }, 1500);
+    }
+  };
+
+  const handleClearChat = async () => {
+    if (!sessionId) return;
+    try {
+      await clearChat({ agentId: agentDetail._id, sessionId });
+      toast.success("Chat history cleared");
+    } catch (error) {
+      toast.error("Failed to clear chat");
+    }
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -117,12 +171,21 @@ export default function ChatUI({
           >
             <RefreshCcw size={18} className={rebooting ? "animate-spin" : ""} />
           </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="text-gray-400 hover:text-red-600 transition-colors"
+            onClick={handleClearChat}
+            title="Clear Chat"
+          >
+            <Trash2 size={18} />
+          </Button>
         </div>
       </div>
 
       {/* Chat Area */}
       <div className="flex-1 overflow-y-auto p-6 space-y-6 bg-gray-50/50 scrollbar-thin scrollbar-thumb-gray-200 scrollbar-track-transparent">
-        {messages.length === 0 ? (
+        {!dbMessages || dbMessages.length === 0 ? (
           <div className="h-full flex flex-col items-center justify-center text-center opacity-50 space-y-4">
             <div className="h-24 w-24 rounded-full bg-gray-100 flex items-center justify-center">
               <Bot size={48} className="text-gray-400" />
@@ -138,9 +201,9 @@ export default function ChatUI({
             </div>
           </div>
         ) : (
-          messages.map((msg) => (
+          dbMessages.map((msg: any) => (
             <div
-              key={msg.id}
+              key={msg._id}
               className={`flex w-full ${msg.role === "user" ? "justify-end" : "justify-start"}`}
             >
               <div
@@ -201,7 +264,6 @@ export default function ChatUI({
       {/* Input Area */}
       <div className="p-4 bg-white border-t border-gray-100">
         <div className="relative flex items-center gap-2 bg-gray-50 p-2 rounded-xl border border-gray-200 focus-within:border-blue-500 focus-within:ring-1 focus-within:ring-blue-500/20 transition-all shadow-sm">
-
           <input
             type="text"
             value={inputValue}

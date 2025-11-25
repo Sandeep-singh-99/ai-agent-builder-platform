@@ -19,5 +19,13 @@ export default defineSchema({
         edges: v.optional(v.any()),
         agentToolConfig: v.optional(v.any()),
         userId: v.id("UserTable"),
+    }),
+
+    ChatTable: defineTable({
+        agentId: v.id("AgentTable"),
+        role: v.string(),
+        content: v.string(),
+        sessionId: v.string(),
+        createdAt: v.number()
     })
 })
