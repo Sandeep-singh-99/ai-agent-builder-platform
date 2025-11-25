@@ -15,6 +15,9 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { UserDetailContext } from "@/context/UserDetailContext";
+import { api } from "@/convex/_generated/api";
+import { useAuth } from "@clerk/nextjs";
+import { useConvex } from "convex/react";
 import {
   Database,
   Gem,
@@ -26,7 +29,7 @@ import {
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useContext } from "react";
+import { useContext, useEffect, useState } from "react";
 
 const MenuOptions = [
   {
@@ -46,7 +49,7 @@ const MenuOptions = [
   },
   {
     title: "Pricing",
-    url: "#",
+    url: "/dashboard/pricing",
     icon: WalletCards,
   },
   {
@@ -60,6 +63,27 @@ export function AppSidebar() {
   const { open } = useSidebar();
   const { userDetails, setUserDetails } = useContext(UserDetailContext);
   const path = usePathname();
+  const {has} = useAuth();
+  const isPaidUser = has&&has({ plan: 'unlimited_plan' })
+  const convex = useConvex();
+
+  const [totalRemianingCredits, setTotalRemianingCredits] = useState(0)
+
+  useEffect(() => {
+    if (isPaidUser && userDetails) {
+      GetUserAgent()
+    }
+  },[userDetails])
+
+
+  const GetUserAgent = async () => {
+    const results = await convex.query(api.agent.GetUserAgents, {
+      userId: userDetails?._id
+    })
+    setTotalRemianingCredits(2 - Number(results?.length || 0))
+    setUserDetails((prev : any) => ({...prev, totalRemianingCredits: 2 - Number(results?.length || 0)}))
+    console.log(results)
+  }
   return (
     <Sidebar collapsible="icon">
       <SidebarHeader>
@@ -89,11 +113,17 @@ export function AppSidebar() {
         {/* <SidebarGroup /> */}
       </SidebarContent>
       <SidebarFooter className="mb-10">
-        <div className="flex gap-2 items-center">
+        {!isPaidUser ? 
+       <div className="w-full">
+         <div className="flex gap-2 items-center">
           <Gem />
-          {open && <h2>Remaining Credits: {userDetails?.token} </h2>}
+          {open && <h2>Remaining Credits: {totalRemianingCredits}/2 </h2>}
         </div>
-        {open && <Button>Upgrade to Unlimited</Button>}
+        {open && <Button className="mt-3">Upgrade to Unlimited</Button>}
+       </div> : 
+       <div>
+        <h2>You can create unlimited Agents</h2>
+        </div>}
       </SidebarFooter>
     </Sidebar>
   );
