@@ -13,6 +13,8 @@ import {
   Panel,
   useOnSelectionChange,
   OnSelectionChangeParams,
+  Node,
+  Edge,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 import StartNode from "../_customNodes/StartNode";
@@ -50,8 +52,13 @@ export const nodeTypes = {
 };
 
 export default function AgentBuilder() {
-  const [nodes, setNodes] = useState([]);
-  const [edges, setEdges] = useState([]);
+  const {
+    addedNodes,
+    setAddedNodes,
+    nodeEdges,
+    setNodeEdges,
+    setSelectedNode,
+  } = useContext(WorkflowContext);
 
   const { agentId } = useParams();
 
@@ -72,30 +79,12 @@ export default function AgentBuilder() {
     GetAgentDetail();
   }, []);
 
-  const {
-    addedNodes,
-    setAddedNodes,
-    nodeEdges,
-    setNodeEdges,
-    setSelectedNode,
-  } = useContext(WorkflowContext);
-
   useEffect(() => {
     if (agentDetail) {
-      setNodes(agentDetail.nodes);
-      setEdges(agentDetail.edges);
       setAddedNodes(agentDetail.nodes);
       setNodeEdges(agentDetail.edges);
     }
   }, [agentDetail]);
-
-  useEffect(() => {
-    addedNodes && setNodes(addedNodes);
-  }, [addedNodes]);
-
-  useEffect(() => {
-    edges && setNodeEdges(edges);
-  }, [edges]);
 
   const SaveNodeAndEdges = async (updatedNodes?: any, updatedEdges?: any) => {
     const result = await updateAgentDetail({
@@ -109,23 +98,24 @@ export default function AgentBuilder() {
 
   const onNodesChange = useCallback(
     (changes: any) =>
-      setNodes((nodesSnapshot) => {
+      setAddedNodes((nodesSnapshot: any) => {
         const updated = applyNodeChanges(changes, nodesSnapshot);
-        setAddedNodes(updated);
         return updated;
       }),
     [setAddedNodes]
   );
   const onEdgesChange = useCallback(
     (changes: any) =>
-      setEdges((edgesSnapshot) => applyEdgeChanges(changes, edgesSnapshot)),
-    []
+      setNodeEdges((edgesSnapshot: any) =>
+        applyEdgeChanges(changes, edgesSnapshot)
+      ),
+    [setNodeEdges]
   );
   const onConnect = useCallback(
     // @ts-ignore
     (params: any) =>
-      setEdges((edgesSnapshot) => addEdge(params, edgesSnapshot)),
-    []
+      setNodeEdges((edgesSnapshot: any) => addEdge(params, edgesSnapshot)),
+    [setNodeEdges]
   );
 
   const onNodeSelect = useCallback(
@@ -143,8 +133,8 @@ export default function AgentBuilder() {
       <Header agentDetail={agentDetail} />
       <div style={{ width: "100vw", height: "90vh" }}>
         <ReactFlow
-          nodes={nodes}
-          edges={edges}
+          nodes={addedNodes}
+          edges={nodeEdges}
           onNodesChange={onNodesChange}
           onEdgesChange={onEdgesChange}
           onConnect={onConnect}

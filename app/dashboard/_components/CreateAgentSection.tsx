@@ -28,17 +28,18 @@ export default function CreateAgentSection() {
   const [agentName, setAgentName] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const { userDetail, setUserDetail } = useContext(UserDetailContext);
+  const { userDetails, setUserDetails } = useContext(UserDetailContext);
 
   const router = useRouter();
 
-  const {has} = useAuth();
-  const isPaidUser = has&&has({ plan: 'unlimited_plan' })
+  const { has } = useAuth();
+  const isPaidUser = has && has({ plan: "unlimited_plan" });
 
   const CreateAgent = async () => {
-
-    if (!isPaidUser && userDetail && userDetail.token <= 0) {
-      toast.error("You have reached the limit of free agents. Please upgrade to unlimited plan to create more agents")
+    if (!isPaidUser && userDetails && userDetails.token <= 0) {
+      toast.error(
+        "You have reached the limit of free agents. Please upgrade to unlimited plan to create more agents"
+      );
       return;
     }
     setLoading(true);
@@ -46,7 +47,7 @@ export default function CreateAgentSection() {
     const results = await CreateAgentMutation({
       agentId: agentId,
       name: agentName ?? "",
-      userId: userDetail?._id,
+      userId: userDetails?._id,
     });
     setOpenDialog(false);
     setLoading(false);

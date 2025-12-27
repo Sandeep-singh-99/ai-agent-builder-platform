@@ -63,27 +63,33 @@ export function AppSidebar() {
   const { open } = useSidebar();
   const { userDetails, setUserDetails } = useContext(UserDetailContext);
   const path = usePathname();
-  const {has} = useAuth();
-  const isPaidUser = has&&has({ plan: 'unlimited_plan' })
+  const { has } = useAuth();
+  const isPaidUser = has && has({ plan: "unlimited_plan" });
   const convex = useConvex();
 
-  const [totalRemianingCredits, setTotalRemianingCredits] = useState(0)
+  const [totalRemianingCredits, setTotalRemianingCredits] = useState(0);
 
   useEffect(() => {
-    if (isPaidUser && userDetails) {
-      GetUserAgent()
+    if (!isPaidUser && userDetails) {
+      GetUserAgent();
     }
-  },[userDetails])
-
+  }, [userDetails, isPaidUser]);
 
   const GetUserAgent = async () => {
     const results = await convex.query(api.agent.GetUserAgents, {
-      userId: userDetails?._id
-    })
-    setTotalRemianingCredits(2 - Number(results?.length || 0))
-    setUserDetails((prev : any) => ({...prev, totalRemianingCredits: 2 - Number(results?.length || 0)}))
-    console.log(results)
-  }
+      userId: userDetails?._id,
+    });
+    const remainingCredits = 2 - Number(results?.length || 0);
+
+    setTotalRemianingCredits(remainingCredits);
+
+    if (userDetails?.totalRemianingCredits !== remainingCredits) {
+      setUserDetails((prev: any) => ({
+        ...prev,
+        totalRemianingCredits: remainingCredits,
+      }));
+    }
+  };
   return (
     <Sidebar collapsible="icon">
       <SidebarHeader>
@@ -99,7 +105,11 @@ export function AppSidebar() {
             <SidebarMenu>
               {MenuOptions.map((option, index) => (
                 <SidebarMenuItem key={index}>
-                  <SidebarMenuButton asChild size={open ? "lg" : "default"} isActive={path === option.url}>
+                  <SidebarMenuButton
+                    asChild
+                    size={open ? "lg" : "default"}
+                    isActive={path === option.url}
+                  >
                     <Link href={option.url}>
                       <option.icon />
                       <span>{option.title}</span>
@@ -113,17 +123,21 @@ export function AppSidebar() {
         {/* <SidebarGroup /> */}
       </SidebarContent>
       <SidebarFooter className="mb-10">
-        {!isPaidUser ? 
-       <div className="w-full">
-         <div className="flex gap-2 items-center">
-          <Gem />
-          {open && <h2>Remaining Credits: {totalRemianingCredits}/2 </h2>}
-        </div>
-        {open && <Button className="mt-3">Upgrade to Unlimited</Button>}
-       </div> : 
-       <div>
-        <h2>You can create unlimited Agents</h2>
-        </div>}
+        {!isPaidUser ? (
+          <div className="w-full">
+            <div className="flex gap-2 items-center">
+              <Gem />
+              {open && <h2>Remaining Credits: {totalRemianingCredits}/2 </h2>}
+            </div>
+            {open && (
+              <Button className="mt-3 w-full">Upgrade to Unlimited</Button>
+            )}
+          </div>
+        ) : (
+          <div>
+            <h2>You can create unlimited Agents</h2>
+          </div>
+        )}
       </SidebarFooter>
     </Sidebar>
   );

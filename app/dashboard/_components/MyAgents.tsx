@@ -1,6 +1,5 @@
 "use client";
 
-import { Card, CardContent } from "@/components/ui/card";
 import { UserDetailContext } from "@/context/UserDetailContext";
 import { api } from "@/convex/_generated/api";
 import { Agent } from "@/types/AgentTypes";
@@ -12,20 +11,20 @@ import moment from "moment";
 import { Id } from "@/convex/_generated/dataModel";
 
 export default function MyAgents() {
-  const { userDetail, setUserDetail } = useContext(UserDetailContext);
+  const { userDetails, setUserDetails } = useContext(UserDetailContext);
   const [agentList, setAgentList] = useState<Agent[]>([]);
   const convex = useConvex();
 
   useEffect(() => {
-    userDetail && GetUserAgents();
-  }, [userDetail]);
+    userDetails && GetUserAgents();
+  }, [userDetails]);
 
   const GetUserAgents = async () => {
     const results = await convex.query(api.agent.GetUserAgents, {
-      userId: userDetail?._id as Id<"UserTable">, 
+      userId: userDetails?._id as Id<"UserTable">,
     });
     console.log("Results", results);
-    
+
     setAgentList(results);
   };
   return (
@@ -35,7 +34,7 @@ export default function MyAgents() {
           <Link
             href={`/agent-builder/${agent.agentId}`}
             key={index}
-            className="p-3  border-2 rounded-2xl"
+            className="p-3 border-3 rounded-2xl"
           >
             <GitBranchPlus className="bg-yellow-100 p-2 h-8 w-8 rounded-sm" />
             <h2 className="mt-3">{agent.name}</h2>
