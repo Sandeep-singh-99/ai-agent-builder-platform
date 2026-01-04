@@ -1,9 +1,23 @@
+import Navbar from "@/components/landing/Navbar";
+import Hero from "@/components/landing/Hero";
+import Features from "@/components/landing/Features";
+import HowItWorks from "@/components/landing/HowItWorks";
+import Pricing from "@/components/landing/Pricing";
+import CallToAction from "@/components/landing/CallToAction";
+import Footer from "@/components/landing/Footer";
 
 export default function Home() {
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen py-2">
-      <h1 className="text-3xl font-bold underline">Hello, AI Agent Builder!</h1>
-      <p>Welcome to the AI Agent Builder Platform.</p>
+    <div className="flex min-h-screen flex-col">
+      <Navbar />
+      <main className="flex-1">
+        <Hero />
+        <Features />
+        <HowItWorks />
+        <Pricing />
+        <CallToAction />
+      </main>
+      <Footer />
     </div>
   );
 }
