@@ -93,10 +93,10 @@ export function AppSidebar() {
   return (
     <Sidebar collapsible="icon">
       <SidebarHeader>
-        <div className="flex items-center gap-2">
+        <Link href="/" className="flex items-center gap-2">
           <Image src="/logo.svg" alt="Logo" width={48} height={48} />
           {open && <h1 className="font-bold">AI Agent Builder Platform</h1>}
-        </div>
+        </Link>
       </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>

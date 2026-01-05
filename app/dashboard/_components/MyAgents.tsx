@@ -60,17 +60,17 @@ export default function MyAgents() {
         {agentList.map((agent, index) => (
           <div
             key={index}
-            className="p-3 border border-gray-200 rounded-2xl shadow-sm hover:shadow-md transition-shadow relative bg-card text-card-foreground group"
+            className="p-3 border-2 border-gray-300 rounded-2xl shadow-sm hover:shadow-md transition-shadow relative bg-card text-card-foreground group"
           >
             <button
-              className="absolute top-3 right-3 p-1 rounded-full hover:bg-destructive/10 text-destructive opacity-0 group-hover:opacity-100 transition-opacity z-10"
+              className="absolute top-3 right-3 p-1 rounded-full hover:bg-background/50 text-destructive opacity-0 group-hover:opacity-100 transition-opacity z-10"
               onClick={(e) => {
                 e.preventDefault(); // Prevent Link navigation if wrapped
                 setDeleteId(agent._id as Id<"AgentTable">);
                 setOpenAlert(true);
               }}
             >
-              <Trash2 className="h-4 w-4" />
+              <Trash2 className="h-4 w-4 cursor-pointer" />
             </button>
             <Link href={`/agent-builder/${agent.agentId}`} className="block">
               <GitBranchPlus className="bg-yellow-100 p-2 h-8 w-8 rounded-sm text-yellow-700" />
@@ -96,7 +96,7 @@ export default function MyAgents() {
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleDelete}
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              className="cursor-pointer"
             >
               Delete
             </AlertDialogAction>

@@ -30,7 +30,7 @@ export default function Navbar() {
           {isSignedIn ? (
             <div className="flex items-center gap-4">
               <Link href="/dashboard">
-                <Button variant="ghost" size="sm">
+                <Button variant="ghost" size="sm" className="cursor-pointer">
                   Dashboard
                 </Button>
               </Link>
