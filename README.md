@@ -2,6 +2,8 @@
 
 A powerful, visual platform for building and managing AI agents. Create complex agent workflows using a drag-and-drop node-based editor.
 
+![image](./screenshot/Screenshot%202026-01-05%20130153.png)
+
 ## 🚀 Features
 
 - **Visual Workflow Builder**: Design agent logic using an intuitive node-based interface powered by React Flow.
